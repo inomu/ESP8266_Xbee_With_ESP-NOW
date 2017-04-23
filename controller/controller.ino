@@ -10,6 +10,8 @@ extern "C" {
 
 uint8_t mac[] = {0x5E,0xCF,0x7F,0x85,0x01,0x12};
 
+uint8_t message[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 };
+
 void printMacAddress(uint8_t* macaddr) {
 	Serial.print("{");
 	for (int i = 0; i < 6; i++) {
@@ -18,6 +20,7 @@ void printMacAddress(uint8_t* macaddr) {
 		if (i < 5) Serial.print(',');
 	}
 	Serial.println("}");
+
 }
 
 void setup() {
@@ -61,24 +64,26 @@ void setup() {
 	});
 
 	esp_now_register_send_cb([](uint8_t* macaddr, uint8_t status) {
-		Serial.println("send_cb");
+		Serial.print("send_cb:");
+    for (int i = 0; i < len ; i++){
+      Serial.print("data: ");
+      Serial.print(message[i],HEX);
+    }
+    Serial.println("");
 
-		Serial.print("mac address: ");
-		printMacAddress(macaddr);
+		//Serial.print("mac address: ");
+		//printMacAddress(macaddr);
 
-		Serial.print("status = "); Serial.println(status);
+		//Serial.print("status = "); Serial.println(status);
+
+
 	});
 
 	int res = esp_now_add_peer(mac, (uint8_t)ESP_NOW_ROLE_SLAVE,(uint8_t)WIFI_DEFAULT_CHANNEL, NULL, 0);
-
-	uint8_t message[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 };
-	esp_now_send(mac, message, sizeof(message));
-
 //	esp_now_unregister_recv_cb();
 //	esp_now_deinit();
 }
 
-uint8_t message[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 };
 void loop() {
   delay(5000);
 	esp_now_send(mac, message, sizeof(message));
