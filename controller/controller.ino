@@ -65,8 +65,9 @@ void setup() {
 
 	esp_now_register_send_cb([](uint8_t* macaddr, uint8_t status) {
 		Serial.print("send_cb:");
-    for (int i = 0; i < len ; i++){
-      Serial.print("data: ");
+    Serial.print("data: ");
+    for (int i = 0; i < sizeof(message); i++){
+      Serial.print(" 0x");
       Serial.print(message[i],HEX);
     }
     Serial.println("");
