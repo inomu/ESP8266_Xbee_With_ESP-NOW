@@ -8,7 +8,8 @@ extern "C" {
 
 #define WIFI_DEFAULT_CHANNEL 1
 
-uint8_t mac[] = {0x18,0xFE,0x34,0xA2,0xE9,0x97};
+//ControllerのSTATION_IFのMACアドレスを書く
+uint8_t mac[] = {0x5C,0xCF,0x7F,0x84,0xD5,0x18};
 
 void printMacAddress(uint8_t* macaddr) {
   Serial.print("{");
@@ -31,18 +32,18 @@ void setup() {
   WiFi.softAP("foobar", "12345678", 1, 0);
 
   uint8_t macaddr[6];
-  wifi_get_macaddr(STATION_IF, macaddr);
+  //wifi_get_macaddr(STATION_IF, macaddr);
   //Serial.print("mac address (STATION_IF): ");
   //printMacAddress(macaddr);
 
   wifi_get_macaddr(SOFTAP_IF, macaddr);
-  Serial.print("mac address (SOFTAP_IF): ");
+  //Serial.print("mac address (SOFTAP_IF): ");
   printMacAddress(macaddr);
 
   if (esp_now_init() == 0) {
-    Serial.println("init");
+    //Serial.println("init");
   } else {
-    Serial.println("init failed");
+    //Serial.println("init failed");
     ESP.restart();
     return;
   }
@@ -52,12 +53,14 @@ void setup() {
   esp_now_register_recv_cb([](uint8_t *macaddr, uint8_t *data, uint8_t len) {
     //Serial.println("recv_cb");
     //Serial.print("mac address: ");
-    Serial.print("data: ");
+    //Serial.print("data: ");
     for (int i = 0; i < len; i++) {
-      Serial.print(" 0x");
-      Serial.print(data[i], HEX);
+      //Serial.print(" 0x");
+      //Serial.print(data[i],  HEX);
+      Serial.write(data[i]);
+
     }
-    Serial.println("");
+    //Serial.println("");
   });
 
   esp_now_register_send_cb([](uint8_t* macaddr, uint8_t status) {

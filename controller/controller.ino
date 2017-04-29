@@ -8,7 +8,8 @@ extern "C" {
 
 #define WIFI_DEFAULT_CHANNEL 1
 
-uint8_t mac[] = {0x5E,0xCF,0x7F,0x85,0x01,0x12};
+//SlaveのSOFTAP_IFのMACアドレスを
+uint8_t mac[] = {0x5E,0xCF,0x7F,0x85,0x07,0xBE};
 
 uint8_t message[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08 };
 
@@ -41,9 +42,9 @@ void setup() {
 	printMacAddress(macaddr);
 
 	if (esp_now_init()==0) {
-		Serial.println("direct link  init ok");
+		//Serial.println("direct link  init ok");
 	} else {
-		Serial.println("dl init failed");
+		//Serial.println("dl init failed");
 		ESP.restart();
 		return;
 	}
@@ -64,13 +65,16 @@ void setup() {
 	});
 
 	esp_now_register_send_cb([](uint8_t* macaddr, uint8_t status) {
-		Serial.print("send_cb:");
-    Serial.print("data: ");
+		//Serial.print("send_cb:");
+    //Serial.print("data: ");
+
+		/*
     for (int i = 0; i < sizeof(message); i++){
       Serial.print(" 0x");
       Serial.print(message[i],HEX);
     }
-    Serial.println("");
+		*/
+    //Serial.println("");
 
 		//Serial.print("mac address: ");
 		//printMacAddress(macaddr);
@@ -79,6 +83,10 @@ void setup() {
 
 
 	});
+  //esp_now_send(mac, message, sizeof(message));
+
+	uint8_t message[] = { 0x42};
+  esp_now_send(mac, message, sizeof(message));
 
 	int res = esp_now_add_peer(mac, (uint8_t)ESP_NOW_ROLE_SLAVE,(uint8_t)WIFI_DEFAULT_CHANNEL, NULL, 0);
 //	esp_now_unregister_recv_cb();
@@ -86,6 +94,11 @@ void setup() {
 }
 
 void loop() {
-  delay(5000);
-	esp_now_send(mac, message, sizeof(message));
+  delay(1);
+  if(Serial.available() > 0){
+    int input = Serial.read();
+    uint8_t rcv_data = input;
+		//Serial.println(rcv_data);
+    esp_now_send(mac, &rcv_data, sizeof(rcv_data));
+  }
 }
